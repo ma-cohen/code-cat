@@ -1,0 +1,49 @@
+version: 2
+
+project_name: ccat
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - binary: ccat
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+release:
+  github:
+    owner: ma-cohen
+    name: code-cat
+
+brews:
+  - name: ccat
+    repository:
+      owner: ma-cohen
+      name: homebrew-tap
+    homepage: https://github.com/ma-cohen/code-cat
+    description: "Git workflow helpers — new-task, new-worktree"
+
+scoops:
+  - repository:
+      owner: ma-cohen
+      name: scoop-bucket
+    homepage: https://github.com/ma-cohen/code-cat
+    description: "Git workflow helpers — new-task, new-worktree"

@@ -1,0 +1,6 @@
+# .code-cat.yml — place this file in your repo root to override ccat defaults.
+# All fields are optional.
+
+# base_branch: main          # branch that new-task and new-worktree branch from (default: master)
+# branch_prefix: "feat/"     # prepended to branch names entered interactively (default: "")
+# worktree_root: "../wt"     # default parent directory for new worktrees (default: ..)
