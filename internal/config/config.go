@@ -18,7 +18,7 @@ type Config struct {
 // ~/.config/code-cat/config.yml (user-global config), merges them, and
 // populates C. Repo config wins over user config wins over built-in defaults.
 func Load() {
-	viper.SetDefault("base_branch", "master")
+	viper.SetDefault("base_branch", "")
 	viper.SetDefault("branch_prefix", "")
 	viper.SetDefault("worktree_root", "..")
 
