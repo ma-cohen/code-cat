@@ -19,10 +19,10 @@ builds:
       - arm64
 
 archives:
-  - format: tar.gz
+  - formats: [tar.gz]
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
 
 checksum:
@@ -32,18 +32,3 @@ release:
   github:
     owner: ma-cohen
     name: code-cat
-
-brews:
-  - name: ccat
-    repository:
-      owner: ma-cohen
-      name: homebrew-tap
-    homepage: https://github.com/ma-cohen/code-cat
-    description: "Git workflow helpers — new-task, new-worktree"
-
-scoops:
-  - repository:
-      owner: ma-cohen
-      name: scoop-bucket
-    homepage: https://github.com/ma-cohen/code-cat
-    description: "Git workflow helpers — new-task, new-worktree"
