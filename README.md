@@ -29,23 +29,35 @@ ccat new-worktree --base main                  # override base branch
 
 ## Install
 
-**Go users:**
+### Windows
+
+```powershell
+go install github.com/ma-cohen/code-cat@latest
+```
+
+Then make sure Go's bin directory is on your PATH (one-time setup). Run this in PowerShell:
+
+```powershell
+[Environment]::SetEnvironmentVariable("PATH", $env:PATH + ";$env:USERPROFILE\go\bin", "User")
+```
+
+Restart your terminal and `ccat` will be available.
+
+### macOS / Linux
+
 ```sh
 go install github.com/ma-cohen/code-cat@latest
 ```
 
-**macOS / Linux (Homebrew):**
+Add Go's bin directory to your PATH if not already set (add to `~/.bashrc` or `~/.zshrc`):
+
 ```sh
-brew install ma-cohen/tap/ccat
+export PATH="$PATH:$(go env GOPATH)/bin"
 ```
 
-**Windows (Scoop):**
-```sh
-scoop bucket add ma-cohen https://github.com/ma-cohen/scoop-bucket
-scoop install ccat
-```
+### Direct download
 
-**Direct download:** grab the binary for your platform from [GitHub Releases](https://github.com/ma-cohen/code-cat/releases) and put it on your PATH.
+Grab the binary for your platform from [GitHub Releases](https://github.com/ma-cohen/code-cat/releases), extract it, and place it somewhere on your PATH.
 
 ## Configuration
 

@@ -33,10 +33,3 @@ release:
     owner: ma-cohen
     name: code-cat
 
-scoops:
-  - repository:
-      owner: ma-cohen
-      name: scoop-bucket
-      token: "{{ .Env.SCOOP_GITHUB_TOKEN }}"
-    homepage: https://github.com/ma-cohen/code-cat
-    description: "Git workflow helpers — new-task, new-worktree"
