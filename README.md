@@ -16,6 +16,16 @@ ccat new-task --push              # push to origin after creation
 ccat new-task --no-fetch          # skip git fetch (useful offline)
 ```
 
+### `ccat home`
+
+Go to the latest base branch from origin, handling uncommitted changes along the way.
+
+```
+ccat home                 # goes to configured base branch
+ccat home --base main     # override base branch
+ccat home --no-fetch      # skip git fetch
+```
+
 ### `ccat new-worktree [path]`
 
 Create a git worktree in a separate directory on a new branch.
@@ -58,6 +68,14 @@ export PATH="$PATH:$(go env GOPATH)/bin"
 ### Direct download
 
 Grab the binary for your platform from [GitHub Releases](https://github.com/ma-cohen/code-cat/releases), extract it, and place it somewhere on your PATH.
+
+## Updating ccat
+
+Run the same install command again — Go will fetch and install the latest version:
+
+```sh
+go install github.com/ma-cohen/code-cat/cmd/ccat@latest
+```
 
 ## Configuration
 
