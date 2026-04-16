@@ -38,3 +38,23 @@ func IsInsideRepo() bool {
 	_, err := Run("rev-parse", "--git-dir")
 	return err == nil
 }
+
+// DefaultBranch returns the remote's default branch by reading origin/HEAD.
+// Falls back to checking for "main" then "master" if the ref is not set.
+func DefaultBranch() (string, error) {
+	out, err := Run("symbolic-ref", "--short", "refs/remotes/origin/HEAD")
+	if err == nil {
+		// Returns e.g. "origin/main" — strip the remote prefix.
+		if _, branch, ok := strings.Cut(out, "/"); ok {
+			return branch, nil
+		}
+		return out, nil
+	}
+	// Remote HEAD not configured; probe for well-known branch names.
+	for _, candidate := range []string{"main", "master"} {
+		if _, err := Run("show-ref", "--verify", "--quiet", "refs/remotes/origin/"+candidate); err == nil {
+			return candidate, nil
+		}
+	}
+	return "", fmt.Errorf("could not determine default branch: set base_branch in .code-cat.yml or run: git remote set-head origin --auto")
+}
