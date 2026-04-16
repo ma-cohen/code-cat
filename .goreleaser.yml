@@ -8,6 +8,7 @@ before:
 
 builds:
   - binary: ccat
+    main: ./cmd/ccat
     env:
       - CGO_ENABLED=0
     goos:

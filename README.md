@@ -32,7 +32,7 @@ ccat new-worktree --base main                  # override base branch
 ### Windows
 
 ```powershell
-go install github.com/ma-cohen/code-cat@latest
+go install github.com/ma-cohen/code-cat/cmd/ccat@latest
 ```
 
 Then make sure Go's bin directory is on your PATH (one-time setup). Run this in PowerShell:
@@ -46,7 +46,7 @@ Restart your terminal and `ccat` will be available.
 ### macOS / Linux
 
 ```sh
-go install github.com/ma-cohen/code-cat@latest
+go install github.com/ma-cohen/code-cat/cmd/ccat@latest
 ```
 
 Add Go's bin directory to your PATH if not already set (add to `~/.bashrc` or `~/.zshrc`):
