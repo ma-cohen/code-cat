@@ -23,6 +23,17 @@ func AskSelect(message string, options []string) (string, error) {
 	return result, err
 }
 
+// AskOptionalString prompts the user for a string that may be left empty.
+func AskOptionalString(message, defaultVal string) (string, error) {
+	var result string
+	q := &survey.Input{
+		Message: message,
+		Default: defaultVal,
+	}
+	err := survey.AskOne(q, &result)
+	return result, err
+}
+
 // AskConfirm prompts the user for a yes/no answer.
 func AskConfirm(message string, defaultVal bool) (bool, error) {
 	var result bool
