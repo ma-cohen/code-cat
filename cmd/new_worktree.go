@@ -33,6 +33,13 @@ func runNewWorktree(cmd *cobra.Command, args []string) error {
 	if base == "" {
 		base = config.C.BaseBranch
 	}
+	if base == "" {
+		var err error
+		base, err = git.DefaultBranch()
+		if err != nil {
+			return err
+		}
+	}
 	branchFlag, _ := cmd.Flags().GetString("branch")
 	noFetch, _ := cmd.Flags().GetBool("no-fetch")
 
