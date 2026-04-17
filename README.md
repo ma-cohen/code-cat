@@ -37,6 +37,20 @@ ccat new-worktree ../scratch --branch wip/exp  # fully specified
 ccat new-worktree --base main                  # override base branch
 ```
 
+### `ccat pr`
+
+Push the current branch to origin and open a pull request via the [GitHub CLI](https://cli.github.com/).
+
+Requires `gh` to be installed and authenticated (`gh auth login`).
+
+```
+ccat pr                          # push + prompts for title and optional body
+ccat pr --draft                  # create as draft PR
+ccat pr --web                    # open the PR form in the browser
+ccat pr --no-push                # skip pushing (branch already on origin)
+ccat pr --base develop           # override base branch
+```
+
 ## Install
 
 ### Windows
