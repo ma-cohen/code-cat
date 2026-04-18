@@ -102,3 +102,13 @@ worktree_root: "../wt"   # default parent directory for new worktrees
 ```
 
 See `.code-cat.yml.example` for all options.
+
+## Claude Code Plugin
+
+Install the ccat plugin to give Claude agents in any repo instant awareness of all ccat commands:
+
+```sh
+claude skills add ma-cohen/code-cat/.claude-plugin
+```
+
+After installation, type `/ccat` in a Claude Code session to inject the full command reference into the agent's context.

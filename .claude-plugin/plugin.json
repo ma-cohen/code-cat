@@ -1,0 +1,6 @@
+{
+  "name": "ccat",
+  "version": "1.0.0",
+  "description": "Exposes ccat git-workflow commands to Claude agents",
+  "commands": ["commands/ccat.md"]
+}
