@@ -2,6 +2,8 @@
 
 Go CLI tool (`ccat`) that automates Git workflows. Entry point: `cmd/ccat/main.go`.
 
+All commands must work with both **GitHub** and **GitLab** (including self-hosted GitLab). Provider is auto-detected from the remote URL; no user configuration required.
+
 ## Testing
 
 **After every bug fix or new feature**, spawn a sub-agent (Task tool) to write tests:

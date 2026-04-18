@@ -39,14 +39,16 @@ ccat new-worktree --base main                  # override base branch
 
 ### `ccat pr`
 
-Push the current branch to origin and open a pull request via the [GitHub CLI](https://cli.github.com/).
+Push the current branch to origin and open a pull request (GitHub) or merge request (GitLab). The provider is auto-detected from the remote URL — no configuration needed.
 
-Requires `gh` to be installed and authenticated (`gh auth login`).
+Requires the matching CLI to be installed and authenticated:
+- **GitHub**: [gh](https://cli.github.com/) — `gh auth login`
+- **GitLab**: [glab](https://gitlab.com/gitlab-org/cli) — `glab auth login`
 
 ```
 ccat pr                          # push + prompts for title and optional body
-ccat pr --draft                  # create as draft PR
-ccat pr --web                    # open the PR form in the browser
+ccat pr --draft                  # create as draft PR/MR
+ccat pr --web                    # open the PR/MR form in the browser
 ccat pr --no-push                # skip pushing (branch already on origin)
 ccat pr --base develop           # override base branch
 ```

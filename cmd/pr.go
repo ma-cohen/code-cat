@@ -11,22 +11,23 @@ import (
 	"github.com/ma-cohen/code-cat/internal/config"
 	"github.com/ma-cohen/code-cat/internal/git"
 	"github.com/ma-cohen/code-cat/internal/prompt"
+	"github.com/ma-cohen/code-cat/internal/provider"
 	"github.com/spf13/cobra"
 )
 
 var prCmd = &cobra.Command{
 	Use:   "pr",
-	Short: "Push the current branch and open a pull request via gh",
+	Short: "Push the current branch and open a pull request or merge request (GitHub & GitLab)",
 	Args:  cobra.NoArgs,
 	RunE:  runPR,
 }
 
 func init() {
 	rootCmd.AddCommand(prCmd)
-	prCmd.Flags().String("base", "", "Base branch for the PR (overrides config)")
+	prCmd.Flags().String("base", "", "Base branch for the PR/MR (overrides config)")
 	prCmd.Flags().Bool("no-push", false, "Skip pushing the branch to origin")
-	prCmd.Flags().Bool("draft", false, "Create the PR as a draft")
-	prCmd.Flags().Bool("web", false, "Open the PR form in the browser instead of creating via CLI")
+	prCmd.Flags().Bool("draft", false, "Create the PR/MR as a draft")
+	prCmd.Flags().Bool("web", false, "Open the PR/MR form in the browser instead of creating via CLI")
 }
 
 // branchToTitle converts a branch name into a human-readable PR title.
@@ -54,9 +55,9 @@ func branchToTitle(branch string) string {
 	return string(runes)
 }
 
-// runGH executes a gh command and returns trimmed stdout.
-func runGH(args ...string) (string, error) {
-	cmd := exec.Command("gh", args...)
+// runCLI executes a provider CLI command and returns trimmed stdout.
+func runCLI(cli string, args ...string) (string, error) {
+	cmd := exec.Command(cli, args...)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -65,7 +66,7 @@ func runGH(args ...string) (string, error) {
 		if msg == "" {
 			msg = err.Error()
 		}
-		return "", fmt.Errorf("gh %s: %s", strings.Join(args, " "), msg)
+		return "", fmt.Errorf("%s %s: %s", cli, strings.Join(args, " "), msg)
 	}
 	return strings.TrimSpace(stdout.String()), nil
 }
@@ -73,10 +74,6 @@ func runGH(args ...string) (string, error) {
 func runPR(cmd *cobra.Command, args []string) error {
 	if !git.IsInsideRepo() {
 		return fmt.Errorf("not inside a git repository")
-	}
-
-	if _, err := exec.LookPath("gh"); err != nil {
-		return fmt.Errorf("gh (GitHub CLI) is not installed or not in PATH\nInstall it from https://cli.github.com/ then run: gh auth login")
 	}
 
 	branch, err := git.CurrentBranch()
@@ -122,6 +119,20 @@ func runPR(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	remoteURL, err := git.RemoteURL("origin")
+	if err != nil {
+		remoteURL = ""
+	}
+	p := provider.Detect(remoteURL)
+
+	if _, err := exec.LookPath(p.CLI); err != nil {
+		installMsg := map[string]string{
+			"gh":   "Install it from https://cli.github.com/ then run: gh auth login",
+			"glab": "Install it from https://gitlab.com/gitlab-org/cli then run: glab auth login",
+		}
+		return fmt.Errorf("%s is not installed or not in PATH\n%s", p.CLI, installMsg[p.CLI])
+	}
+
 	title, err := prompt.AskString("PR title", branchToTitle(branch))
 	if err != nil {
 		return err
@@ -135,27 +146,30 @@ func runPR(cmd *cobra.Command, args []string) error {
 	draft, _ := cmd.Flags().GetBool("draft")
 	web, _ := cmd.Flags().GetBool("web")
 
-	ghArgs := []string{"pr", "create",
-		"--base", base,
+	cliArgs := append(p.SubCmd,
+		p.BaseBranchFlag, base,
 		"--title", title,
-		"--body", body,
+		p.BodyFlag, body,
+	)
+	if p.SourceBranchFlag != "" {
+		cliArgs = append(cliArgs, p.SourceBranchFlag, branch)
 	}
 	if draft {
-		ghArgs = append(ghArgs, "--draft")
+		cliArgs = append(cliArgs, "--draft")
 	}
 	if web {
-		ghArgs = append(ghArgs, "--web")
+		cliArgs = append(cliArgs, "--web")
 	}
 
 	if web {
-		fmt.Println("Opening PR form in your browser...")
-		ghCmd := exec.Command("gh", ghArgs...)
-		ghCmd.Stdout = os.Stdout
-		ghCmd.Stderr = os.Stderr
-		return ghCmd.Run()
+		fmt.Println("Opening PR/MR form in your browser...")
+		c := exec.Command(p.CLI, cliArgs...)
+		c.Stdout = os.Stdout
+		c.Stderr = os.Stderr
+		return c.Run()
 	}
 
-	url, err := runGH(ghArgs...)
+	url, err := runCLI(p.CLI, cliArgs...)
 	if err != nil {
 		return err
 	}

@@ -46,19 +46,21 @@ Prints the absolute path and branch name when done.
 
 ### `ccat pr`
 
-Push the current branch to origin and create a pull request via the GitHub CLI (`gh`).
+Push the current branch to origin and create a pull request (GitHub) or merge request (GitLab). Provider is auto-detected from the remote URL.
 
-Requires `gh` installed and authenticated (`gh auth login`).
+Requires the matching CLI installed and authenticated:
+- GitHub: `gh` — `gh auth login`
+- GitLab: `glab` — `glab auth login`
 
 ```
 ccat pr                     # push + prompts for title and optional body
-ccat pr --draft             # create as draft PR
-ccat pr --web               # open the PR form in the browser
+ccat pr --draft             # create as draft PR/MR
+ccat pr --web               # open the PR/MR form in the browser
 ccat pr --no-push           # skip pushing (branch already on origin)
 ccat pr --base develop      # override base branch
 ```
 
-Auto-generates a PR title from the branch name (strips prefixes like `feat/`, `fix/`, `chore/`, etc.).
+Auto-generates a title from the branch name (strips prefixes like `feat/`, `fix/`, `chore/`, etc.).
 
 ## Configuration
 
