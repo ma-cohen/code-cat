@@ -16,4 +16,4 @@ Test command: `go test -race -count=1 ./...`
 
 ## Plugin maintenance
 
-**When you add or modify a `ccat` command**, update `.claude-plugin/commands/ccat.md` to reflect the change — new flags, new commands, or changed behavior. This keeps the `/ccat` slash command accurate for agents in repos that have the plugin installed.
+**When you add or modify a `ccat` command**, update `.claude-skill/commands/ccat.md` to reflect the change — new flags, new commands, or changed behavior. This keeps the `/ccat` slash command accurate for agents in repos that have the skill installed.

@@ -90,7 +90,27 @@ See `.code-cat.yml.example` for all options.
 Install the ccat plugin to give Claude agents in any repo instant awareness of all ccat commands:
 
 ```sh
-claude skills add ma-cohen/code-cat/.claude-plugin
+claude skills add ma-cohen/code-cat/.claude-skill
 ```
 
 After installation, type `/ccat` in a Claude Code session to inject the full command reference into the agent's context.
+
+### Global install (all projects)
+
+To make `/ccat` available in every Claude Code session regardless of project, copy the command file to your user-level commands directory:
+
+**macOS / Linux**
+```sh
+mkdir -p ~/.claude/commands
+curl -fsSL https://raw.githubusercontent.com/ma-cohen/code-cat/main/.claude-skill/commands/ccat.md \
+  -o ~/.claude/commands/ccat.md
+```
+
+**Windows (PowerShell)**
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude\commands" | Out-Null
+Invoke-WebRequest https://raw.githubusercontent.com/ma-cohen/code-cat/main/.claude-skill/commands/ccat.md `
+  -OutFile "$env:USERPROFILE\.claude\commands\ccat.md"
+```
+
+The `/ccat` command will then be available in all your projects without any per-repo setup.
