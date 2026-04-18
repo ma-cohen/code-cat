@@ -11,6 +11,8 @@ builds:
     main: ./cmd/ccat
     env:
       - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X github.com/ma-cohen/code-cat/cmd.version={{.Version}}
     goos:
       - linux
       - windows
