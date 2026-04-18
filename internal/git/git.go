@@ -39,6 +39,11 @@ func IsInsideRepo() bool {
 	return err == nil
 }
 
+// RemoteURL returns the fetch URL for the named remote.
+func RemoteURL(remote string) (string, error) {
+	return Run("remote", "get-url", remote)
+}
+
 // DefaultBranch returns the remote's default branch by reading origin/HEAD.
 // Falls back to checking for "main" then "master" if the ref is not set.
 func DefaultBranch() (string, error) {
