@@ -108,9 +108,9 @@ curl -fsSL https://raw.githubusercontent.com/ma-cohen/code-cat/main/.claude-skil
 
 **Windows (PowerShell)**
 ```powershell
-New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude\commands" | Out-Null
+New-Item -ItemType Directory -Force "$HOME\.claude\commands" | Out-Null
 Invoke-WebRequest https://raw.githubusercontent.com/ma-cohen/code-cat/main/.claude-skill/commands/ccat.md `
-  -OutFile "$env:USERPROFILE\.claude\commands\ccat.md"
+  -OutFile "$HOME\.claude\commands\ccat.md"
 ```
 
 The `/ccat` command will then be available in all your projects without any per-repo setup.
