@@ -56,40 +56,22 @@ ccat pr --base develop           # override base branch
 ### Windows
 
 ```powershell
-go install github.com/ma-cohen/code-cat/cmd/ccat@latest
+irm https://raw.githubusercontent.com/ma-cohen/code-cat/main/install.ps1 | iex
 ```
 
-Then make sure Go's bin directory is on your PATH (one-time setup). Run this in PowerShell:
-
-```powershell
-[Environment]::SetEnvironmentVariable("PATH", $env:PATH + ";$env:USERPROFILE\go\bin", "User")
-```
-
-Restart your terminal and `ccat` will be available.
+Installs to `~\.local\bin` and adds it to your PATH automatically. Restart your terminal and `ccat` will be available.
 
 ### macOS / Linux
 
 ```sh
-go install github.com/ma-cohen/code-cat/cmd/ccat@latest
+curl -fsSL https://raw.githubusercontent.com/ma-cohen/code-cat/main/install.sh | sh
 ```
 
-Add Go's bin directory to your PATH if not already set (add to `~/.bashrc` or `~/.zshrc`):
-
-```sh
-export PATH="$PATH:$(go env GOPATH)/bin"
-```
-
-### Direct download
-
-Grab the binary for your platform from [GitHub Releases](https://github.com/ma-cohen/code-cat/releases), extract it, and place it somewhere on your PATH.
+Installs to `/usr/local/bin` (will prompt for sudo if needed).
 
 ## Updating ccat
 
-Run the same install command again — Go will fetch and install the latest version:
-
-```sh
-go install github.com/ma-cohen/code-cat/cmd/ccat@latest
-```
+Run the same install command again — the script always fetches the latest release.
 
 ## Configuration
 
