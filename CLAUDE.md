@@ -13,3 +13,7 @@ Go CLI tool (`ccat`) that automates Git workflows. Entry point: `cmd/ccat/main.g
 The sub-agent receives only the modified files — not the full conversation context.
 
 Test command: `go test -race -count=1 ./...`
+
+## Plugin maintenance
+
+**When you add or modify a `ccat` command**, update `.claude-plugin/commands/ccat.md` to reflect the change — new flags, new commands, or changed behavior. This keeps the `/ccat` slash command accurate for agents in repos that have the plugin installed.
