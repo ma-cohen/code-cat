@@ -69,7 +69,17 @@ Installs to `~\.local\bin` and adds it to your PATH automatically. Restart your 
 curl -fsSL https://raw.githubusercontent.com/ma-cohen/code-cat/main/install.sh | sh
 ```
 
-Installs to `/usr/local/bin` (will prompt for sudo if needed).
+Installs to `~/.local/bin` by default (no sudo). If that directory is not already on your `PATH`, the script prints a one-line `export` to add — use a new terminal afterward (same idea as the Windows installer).
+
+**System-wide install** (optional): set `INSTALL_DIR` before running, for example:
+
+```sh
+INSTALL_DIR=/usr/local/bin curl -fsSL https://raw.githubusercontent.com/ma-cohen/code-cat/main/install.sh | sh
+```
+
+That may prompt for `sudo` when the target directory is not writable by you.
+
+**Troubleshooting:** If `INSTALL_DIR` exists but is not traversable for normal users (for example `/usr/local/bin` with mode `700` owned by root), the binary can be installed successfully yet still be unusable until directory permissions are fixed, or until you install to a user-local path such as the default `~/.local/bin`.
 
 ## Updating ccat
 
