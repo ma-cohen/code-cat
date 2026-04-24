@@ -62,6 +62,24 @@ ccat pr --base develop      # override base branch
 
 Auto-generates a title from the branch name (strips prefixes like `feat/`, `fix/`, `chore/`, etc.).
 
+### `ccat repo`
+
+Open the repository in the browser (GitHub or GitLab). Provider is auto-detected from the remote URL.
+
+```
+ccat repo                   # opens the repo homepage in your browser
+```
+
+### `ccat view-pr`
+
+Open the pull request or merge request for the current branch in the browser. Provider is auto-detected from the remote URL.
+
+```
+ccat view-pr                # opens the PR/MR for the current branch
+```
+
+If no PR/MR exists for the current branch, the CLI will display an error.
+
 ## Configuration
 
 Place a `.code-cat.yml` in the repo root to override defaults:
