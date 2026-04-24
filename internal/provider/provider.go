@@ -10,6 +10,8 @@ type Provider struct {
 	BaseBranchFlag   string   // "--base" | "--target-branch"
 	BodyFlag         string   // "--body" | "--description"
 	SourceBranchFlag string   // "" (implicit) | "--source-branch"
+	BrowseRepoCmd    []string // ["browse"] | ["repo", "view", "--web"]
+	ViewPRCmd        []string // ["pr", "view", "--web"] | ["mr", "view", "--web"]
 }
 
 var github = Provider{
@@ -19,6 +21,8 @@ var github = Provider{
 	BaseBranchFlag:   "--base",
 	BodyFlag:         "--body",
 	SourceBranchFlag: "",
+	BrowseRepoCmd:    []string{"browse"},
+	ViewPRCmd:        []string{"pr", "view", "--web"},
 }
 
 var gitlab = Provider{
@@ -28,6 +32,8 @@ var gitlab = Provider{
 	BaseBranchFlag:   "--target-branch",
 	BodyFlag:         "--description",
 	SourceBranchFlag: "--source-branch",
+	BrowseRepoCmd:    []string{"repo", "view", "--web"},
+	ViewPRCmd:        []string{"mr", "view", "--web"},
 }
 
 // Detect returns the Provider for the given remote URL.
