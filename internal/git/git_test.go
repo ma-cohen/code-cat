@@ -138,6 +138,34 @@ func TestCurrentBranch(t *testing.T) {
 	})
 }
 
+func TestUpstreamBranch(t *testing.T) {
+	t.Run("returns configured upstream branch", func(t *testing.T) {
+		makeTempRepoWithRemote(t, "main")
+		if _, err := Run("branch", "--set-upstream-to=origin/main"); err != nil {
+			t.Fatalf("set upstream: %v", err)
+		}
+
+		upstream, err := UpstreamBranch()
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if upstream != "origin/main" {
+			t.Errorf("got %q, want %q", upstream, "origin/main")
+		}
+	})
+
+	t.Run("errors when current branch has no upstream", func(t *testing.T) {
+		makeTempRepo(t)
+		_, err := UpstreamBranch()
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "current branch has no upstream branch") {
+			t.Errorf("error %q does not contain expected message", err.Error())
+		}
+	})
+}
+
 func TestHasUncommitted(t *testing.T) {
 	t.Run("clean repo returns false", func(t *testing.T) {
 		makeTempRepo(t)
