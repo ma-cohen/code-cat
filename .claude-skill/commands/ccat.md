@@ -80,6 +80,17 @@ ccat view-pr                # opens the PR/MR for the current branch
 
 If no PR/MR exists for the current branch, the CLI will display an error.
 
+### `ccat reset`
+
+Remove local work from the current branch by resetting it to its upstream branch.
+
+```
+ccat reset                  # prompts before removing local work
+ccat reset --force          # skip confirmation
+```
+
+Removes staged changes, unstaged changes, untracked files/directories, and unpushed commits. Ignored files are preserved.
+
 ## Configuration
 
 Place a `.code-cat.yml` in the repo root to override defaults:
@@ -98,3 +109,4 @@ Config precedence: repo-local `.code-cat.yml` > user-global `~/.config/code-cat/
 - Use `ccat home` when you need to get back to the base branch cleanly.
 - Use `ccat new-worktree` when you want to work on multiple branches simultaneously in separate directories.
 - Use `ccat pr` as the final step when a branch is ready for review.
+- Use `ccat reset` when you want to permanently discard local work and return the current branch to upstream.

@@ -24,6 +24,15 @@ func CurrentBranch() (string, error) {
 	return Run("rev-parse", "--abbrev-ref", "HEAD")
 }
 
+// UpstreamBranch returns the upstream ref for the currently checked-out branch.
+func UpstreamBranch() (string, error) {
+	upstream, err := Run("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
+	if err != nil {
+		return "", fmt.Errorf("current branch has no upstream branch; set one before running reset")
+	}
+	return upstream, nil
+}
+
 // HasUncommitted returns true if there are uncommitted changes in the working tree.
 func HasUncommitted() (bool, error) {
 	out, err := Run("status", "--porcelain")
