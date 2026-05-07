@@ -30,6 +30,18 @@ ccat home --no-fetch        # skip git fetch
 
 When uncommitted changes exist, offers: **Stash**, **Discard**, or **Abort**.
 
+### `ccat stash [name]`
+
+Stash current changes, including untracked files, with a message.
+
+```
+ccat stash                         # prompts for a stash name
+ccat stash "wip auth cleanup"      # stash using the provided name
+ccat stash pop                     # choose a stash interactively and pop it
+```
+
+Stash names are Git stash messages and are not guaranteed to be unique.
+
 ### `ccat new-worktree [path]`
 
 Create a git worktree in a separate directory on a new branch.
@@ -96,5 +108,6 @@ Config precedence: repo-local `.code-cat.yml` > user-global `~/.config/code-cat/
 
 - Use `ccat new-task` to start any new piece of work — it keeps your base branch fresh.
 - Use `ccat home` when you need to get back to the base branch cleanly.
+- Use `ccat stash` to quickly save named work-in-progress changes, and `ccat stash pop` to restore one interactively.
 - Use `ccat new-worktree` when you want to work on multiple branches simultaneously in separate directories.
 - Use `ccat pr` as the final step when a branch is ready for review.

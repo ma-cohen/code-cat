@@ -7,6 +7,12 @@ import (
 	"strings"
 )
 
+// StashEntry describes one entry from git stash list.
+type StashEntry struct {
+	Ref     string
+	Message string
+}
+
 // Run executes a git command in the current working directory and returns trimmed stdout.
 func Run(args ...string) (string, error) {
 	cmd := exec.Command("git", args...)
@@ -31,6 +37,47 @@ func HasUncommitted() (bool, error) {
 		return false, err
 	}
 	return len(out) > 0, nil
+}
+
+// StashPush stashes tracked and untracked changes with a message.
+func StashPush(message string) error {
+	_, err := Run("stash", "push", "-u", "-m", message)
+	return err
+}
+
+// ListStashes returns stash entries in Git's newest-first order.
+func ListStashes() ([]StashEntry, error) {
+	out, err := Run("stash", "list", "--format=%gd%x00%gs")
+	if err != nil {
+		return nil, err
+	}
+	return parseStashList(out), nil
+}
+
+func parseStashList(out string) []StashEntry {
+	if out == "" {
+		return nil
+	}
+
+	lines := strings.Split(out, "\n")
+	stashes := make([]StashEntry, 0, len(lines))
+	for _, line := range lines {
+		ref, message, ok := strings.Cut(line, "\x00")
+		if !ok || ref == "" {
+			continue
+		}
+		stashes = append(stashes, StashEntry{
+			Ref:     ref,
+			Message: message,
+		})
+	}
+	return stashes
+}
+
+// StashPop applies and removes the stash matching ref.
+func StashPop(ref string) error {
+	_, err := Run("stash", "pop", ref)
+	return err
 }
 
 // IsInsideRepo returns true when the current directory is inside a git repository.

@@ -204,6 +204,87 @@ func TestHasUncommitted(t *testing.T) {
 	})
 }
 
+func TestParseStashList(t *testing.T) {
+	out := strings.Join([]string{
+		"stash@{0}\x00On main: first stash",
+		"malformed stash line",
+		"\x00missing ref",
+		"stash@{1}\x00On feature: second stash",
+		"stash@{2}\x00",
+	}, "\n")
+
+	got := parseStashList(out)
+	want := []StashEntry{
+		{Ref: "stash@{0}", Message: "On main: first stash"},
+		{Ref: "stash@{1}", Message: "On feature: second stash"},
+		{Ref: "stash@{2}", Message: ""},
+	}
+
+	if len(got) != len(want) {
+		t.Fatalf("len(parseStashList(...)) = %d, want %d: %#v", len(got), len(want), got)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("parseStashList(...)[%d] = %#v, want %#v", i, got[i], want[i])
+		}
+	}
+}
+
+func TestParseStashListEmpty(t *testing.T) {
+	got := parseStashList("")
+	if got != nil {
+		t.Errorf("parseStashList(\"\") = %#v, want nil", got)
+	}
+}
+
+func TestStashPushListAndPop(t *testing.T) {
+	makeTempRepo(t)
+
+	if err := os.WriteFile("stash.txt", []byte("stashed changes"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := StashPush("save untracked file"); err != nil {
+		t.Fatalf("StashPush: %v", err)
+	}
+
+	dirty, err := HasUncommitted()
+	if err != nil {
+		t.Fatalf("HasUncommitted: %v", err)
+	}
+	if dirty {
+		t.Error("expected clean repo after stashing changes")
+	}
+
+	stashes, err := ListStashes()
+	if err != nil {
+		t.Fatalf("ListStashes: %v", err)
+	}
+	if len(stashes) != 1 {
+		t.Fatalf("len(ListStashes()) = %d, want 1: %#v", len(stashes), stashes)
+	}
+	if stashes[0].Ref != "stash@{0}" {
+		t.Errorf("stash ref = %q, want %q", stashes[0].Ref, "stash@{0}")
+	}
+	if !strings.Contains(stashes[0].Message, "save untracked file") {
+		t.Errorf("stash message = %q, want it to contain %q", stashes[0].Message, "save untracked file")
+	}
+
+	if err := StashPop(stashes[0].Ref); err != nil {
+		t.Fatalf("StashPop: %v", err)
+	}
+	if _, err := os.Stat("stash.txt"); err != nil {
+		t.Fatalf("expected stashed file to be restored: %v", err)
+	}
+	stashes, err = ListStashes()
+	if err != nil {
+		t.Fatalf("ListStashes after pop: %v", err)
+	}
+	if len(stashes) != 0 {
+		t.Errorf("len(ListStashes()) after pop = %d, want 0: %#v", len(stashes), stashes)
+	}
+}
+
 func TestIsInsideRepo(t *testing.T) {
 	t.Run("returns true inside repo", func(t *testing.T) {
 		makeTempRepo(t)
