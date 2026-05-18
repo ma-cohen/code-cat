@@ -1,6 +1,6 @@
 # ccat — Git Workflow CLI
 
-`ccat` automates repetitive Git tasks: branching, worktrees, and pull requests.
+`ccat` automates repetitive Git tasks: branching, worktrees, and repository navigation.
 
 ## Commands
 
@@ -52,27 +52,38 @@ ccat new-worktree ../my-hotfix                  # prompts for branch name only
 ccat new-worktree ../scratch --branch wip/exp   # fully specified
 ccat new-worktree --base main                   # override base branch
 ccat new-worktree --no-fetch                    # skip git fetch
+ccat new-worktree --print-path                  # stdout: only absolute path (use with cd "$(ccat ...)")
+ccat new-worktree --no-enter                    # skip opening a shell in the new worktree (TTY only)
 ```
 
-Prints the absolute path and branch name when done.
+After creation, messages go to stderr. On an interactive TTY, `ccat` can open a subshell in the
+new directory (decline with `--no-enter`). For a `cd` in the **current** shell, use `--print-path`.
+
+### `ccat remove-worktree`
+
+Remove linked worktrees interactively. Multi-select paths to remove, or choose **All removable
+worktrees** to remove every linked worktree except the one you are in. You are always asked to
+confirm before deleting. `--force` is passed to `git worktree remove` (for example when a
+worktree has local changes).
+
+```
+ccat remove-worktree
+ccat remove-worktree --force
+```
 
 ### `ccat pr`
 
-Push the current branch to origin and create a pull request (GitHub) or merge request (GitLab). Provider is auto-detected from the remote URL.
+Open the pull request (GitHub) or merge request (GitLab) for the current branch in the browser. Provider is auto-detected from the remote URL.
 
 Requires the matching CLI installed and authenticated:
 - GitHub: `gh` — `gh auth login`
 - GitLab: `glab` — `glab auth login`
 
 ```
-ccat pr                     # push + prompts for title and optional body
-ccat pr --draft             # create as draft PR/MR
-ccat pr --web               # open the PR/MR form in the browser
-ccat pr --no-push           # skip pushing (branch already on origin)
-ccat pr --base develop      # override base branch
+ccat pr                     # opens the PR/MR for the current branch
 ```
 
-Auto-generates a title from the branch name (strips prefixes like `feat/`, `fix/`, `chore/`, etc.).
+If no PR/MR exists for the current branch, the provider CLI will display an error.
 
 ### `ccat repo`
 
@@ -81,16 +92,6 @@ Open the repository in the browser (GitHub or GitLab). Provider is auto-detected
 ```
 ccat repo                   # opens the repo homepage in your browser
 ```
-
-### `ccat view-pr`
-
-Open the pull request or merge request for the current branch in the browser. Provider is auto-detected from the remote URL.
-
-```
-ccat view-pr                # opens the PR/MR for the current branch
-```
-
-If no PR/MR exists for the current branch, the CLI will display an error.
 
 ## Configuration
 
@@ -110,4 +111,5 @@ Config precedence: repo-local `.code-cat.yml` > user-global `~/.config/code-cat/
 - Use `ccat home` when you need to get back to the base branch cleanly.
 - Use `ccat stash` to quickly save named work-in-progress changes, and `ccat stash pop` to restore one interactively.
 - Use `ccat new-worktree` when you want to work on multiple branches simultaneously in separate directories.
-- Use `ccat pr` as the final step when a branch is ready for review.
+- Use `ccat remove-worktree` to clean up extra linked worktrees (with an “all” option).
+- Use `ccat pr` to open the existing PR/MR for the current branch.

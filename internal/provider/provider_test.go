@@ -1,6 +1,9 @@
 package provider
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestDetect(t *testing.T) {
 	tests := []struct {
@@ -25,30 +28,6 @@ func TestDetect(t *testing.T) {
 		if p.CLI != tt.wantCLI {
 			t.Errorf("Detect(%q).CLI = %q, want %q", tt.remoteURL, p.CLI, tt.wantCLI)
 		}
-	}
-}
-
-func TestProviderFlags(t *testing.T) {
-	gh := Detect("https://github.com/owner/repo.git")
-	if gh.BaseBranchFlag != "--base" {
-		t.Errorf("github BaseBranchFlag = %q, want --base", gh.BaseBranchFlag)
-	}
-	if gh.BodyFlag != "--body" {
-		t.Errorf("github BodyFlag = %q, want --body", gh.BodyFlag)
-	}
-	if gh.SourceBranchFlag != "" {
-		t.Errorf("github SourceBranchFlag = %q, want empty", gh.SourceBranchFlag)
-	}
-
-	gl := Detect("https://gitlab.com/owner/repo.git")
-	if gl.BaseBranchFlag != "--target-branch" {
-		t.Errorf("gitlab BaseBranchFlag = %q, want --target-branch", gl.BaseBranchFlag)
-	}
-	if gl.BodyFlag != "--description" {
-		t.Errorf("gitlab BodyFlag = %q, want --description", gl.BodyFlag)
-	}
-	if gl.SourceBranchFlag != "--source-branch" {
-		t.Errorf("gitlab SourceBranchFlag = %q, want --source-branch", gl.SourceBranchFlag)
 	}
 }
 
@@ -100,6 +79,15 @@ func TestViewPRCmd(t *testing.T) {
 			if p.ViewPRCmd[i] != tt.want[i] {
 				t.Errorf("Detect(%q).ViewPRCmd[%d] = %q, want %q", tt.remoteURL, i, p.ViewPRCmd[i], tt.want[i])
 			}
+		}
+	}
+}
+
+func TestProviderDoesNotExposeCreatePRFields(t *testing.T) {
+	providerType := reflect.TypeOf(Provider{})
+	for _, field := range []string{"SubCmd", "BaseBranchFlag", "BodyFlag", "SourceBranchFlag"} {
+		if _, ok := providerType.FieldByName(field); ok {
+			t.Errorf("Provider still exposes removed creation field %s", field)
 		}
 	}
 }
