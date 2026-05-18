@@ -23,6 +23,7 @@ var stashPopCmd = &cobra.Command{
 }
 
 func init() {
+	rootCmd.AddCommand(stashCmd)
 	stashCmd.AddCommand(stashPopCmd)
 }
 

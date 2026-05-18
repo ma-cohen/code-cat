@@ -21,6 +21,7 @@ var newWorktreeCmd = &cobra.Command{
 }
 
 func init() {
+	rootCmd.AddCommand(newWorktreeCmd)
 	newWorktreeCmd.Flags().String("base", "", "Base branch to branch from (overrides config)")
 	newWorktreeCmd.Flags().String("branch", "", "Name for the new branch in the worktree")
 	newWorktreeCmd.Flags().Bool("no-fetch", false, "Skip git fetch")

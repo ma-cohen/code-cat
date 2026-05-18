@@ -18,6 +18,7 @@ var homeCmd = &cobra.Command{
 }
 
 func init() {
+	rootCmd.AddCommand(homeCmd)
 	homeCmd.Flags().String("base", "", "Base branch to go to (overrides config)")
 	homeCmd.Flags().Bool("no-fetch", false, "Skip git fetch")
 }

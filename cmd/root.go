@@ -16,19 +16,6 @@ var rootCmd = &cobra.Command{
 	Version: version,
 }
 
-// topLevelCommands is the only place top-level subcommands are registered on the root.
-// Keep this list in sync with new command files — nested commands use their parent's AddCommand.
-// Tests enforce that rootCmd matches this slice so `ccat --help` cannot drift.
-var topLevelCommands = []*cobra.Command{
-	newTaskCmd,
-	homeCmd,
-	stashCmd,
-	newWorktreeCmd,
-	removeWorktreeCmd,
-	prCmd,
-	repoCmd,
-}
-
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -38,7 +25,4 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(config.Load)
-	for _, c := range topLevelCommands {
-		rootCmd.AddCommand(c)
-	}
 }

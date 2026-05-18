@@ -17,6 +17,10 @@ var repoCmd = &cobra.Command{
 	RunE:  runRepo,
 }
 
+func init() {
+	rootCmd.AddCommand(repoCmd)
+}
+
 func runRepo(cmd *cobra.Command, args []string) error {
 	if !git.IsInsideRepo() {
 		return fmt.Errorf("not inside a git repository")

@@ -18,6 +18,7 @@ var newTaskCmd = &cobra.Command{
 }
 
 func init() {
+	rootCmd.AddCommand(newTaskCmd)
 	newTaskCmd.Flags().String("base", "", "Base branch to update from (overrides config)")
 	newTaskCmd.Flags().Bool("no-fetch", false, "Skip git fetch")
 	newTaskCmd.Flags().Bool("push", false, "Push new branch to origin after creation")
