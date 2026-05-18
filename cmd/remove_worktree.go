@@ -21,7 +21,6 @@ var removeWorktreeCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(removeWorktreeCmd)
 	removeWorktreeCmd.Flags().Bool("force", false, "Force remove even if there are uncommitted changes or untracked files")
 }
 
