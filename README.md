@@ -35,23 +35,39 @@ ccat new-worktree                              # prompts for path and branch
 ccat new-worktree ../my-hotfix                 # prompts for branch name only
 ccat new-worktree ../scratch --branch wip/exp  # fully specified
 ccat new-worktree --base main                  # override base branch
+ccat new-worktree --no-fetch                   # skip git fetch
+ccat new-worktree --print-path                 # stdout: only the new path (for scripting)
+ccat new-worktree --no-enter                   # skip “open a shell here?” on interactive terminals
+```
+
+In a normal interactive terminal, after the worktree is created you can opt in to open your
+shell (`$SHELL`) with its working directory set to the new path. For a real `cd` in the
+current shell, use `cd "$(ccat new-worktree ... --print-path)"` (or a small shell wrapper).
+
+### `ccat remove-worktree`
+
+Interactively remove linked worktrees (not the checkout you are currently in). Choose one or
+more entries, or select **All removable worktrees** to delete every linked worktree except
+this one.
+
+```
+ccat remove-worktree           # multi-select + confirmation
+ccat remove-worktree --force   # pass --force to git worktree remove (e.g. uncommitted changes)
 ```
 
 ### `ccat pr`
 
-Push the current branch to origin and open a pull request (GitHub) or merge request (GitLab). The provider is auto-detected from the remote URL — no configuration needed.
+Open the pull request (GitHub) or merge request (GitLab) for the current branch in the browser. The provider is auto-detected from the remote URL — no configuration needed.
 
 Requires the matching CLI to be installed and authenticated:
 - **GitHub**: [gh](https://cli.github.com/) — `gh auth login`
 - **GitLab**: [glab](https://gitlab.com/gitlab-org/cli) — `glab auth login`
 
 ```
-ccat pr                          # push + prompts for title and optional body
-ccat pr --draft                  # create as draft PR/MR
-ccat pr --web                    # open the PR/MR form in the browser
-ccat pr --no-push                # skip pushing (branch already on origin)
-ccat pr --base develop           # override base branch
+ccat pr                          # opens the PR/MR for the current branch
 ```
+
+If no PR/MR exists for the current branch, the provider CLI will display an error.
 
 ## Install
 

@@ -44,3 +44,15 @@ func AskConfirm(message string, defaultVal bool) (bool, error) {
 	err := survey.AskOne(q, &result)
 	return result, err
 }
+
+// AskMultiSelect prompts the user to pick any number of options from a list.
+func AskMultiSelect(message string, options []string) ([]string, error) {
+	var result []string
+	q := &survey.MultiSelect{
+		Message:  message,
+		Options:  options,
+		PageSize: 10,
+	}
+	err := survey.AskOne(q, &result)
+	return result, err
+}

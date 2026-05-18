@@ -2,12 +2,15 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/ma-cohen/code-cat/internal/config"
 	"github.com/ma-cohen/code-cat/internal/git"
 	"github.com/ma-cohen/code-cat/internal/prompt"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 )
 
 var newWorktreeCmd = &cobra.Command{
@@ -22,6 +25,8 @@ func init() {
 	newWorktreeCmd.Flags().String("base", "", "Base branch to branch from (overrides config)")
 	newWorktreeCmd.Flags().String("branch", "", "Name for the new branch in the worktree")
 	newWorktreeCmd.Flags().Bool("no-fetch", false, "Skip git fetch")
+	newWorktreeCmd.Flags().Bool("print-path", false, "Print only the new worktree path on stdout (for cd \"$(ccat ...)\")")
+	newWorktreeCmd.Flags().Bool("no-enter", false, "Do not offer to open a shell in the new worktree")
 }
 
 func runNewWorktree(cmd *cobra.Command, args []string) error {
@@ -42,10 +47,12 @@ func runNewWorktree(cmd *cobra.Command, args []string) error {
 	}
 	branchFlag, _ := cmd.Flags().GetString("branch")
 	noFetch, _ := cmd.Flags().GetBool("no-fetch")
+	printPath, _ := cmd.Flags().GetBool("print-path")
+	noEnter, _ := cmd.Flags().GetBool("no-enter")
 
 	// Fetch
 	if !noFetch {
-		fmt.Printf("Fetching origin...\n")
+		fmt.Fprintf(os.Stderr, "Fetching origin...\n")
 		if _, err := git.Run("fetch", "origin"); err != nil {
 			return err
 		}
@@ -79,9 +86,49 @@ func runNewWorktree(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	absPath, _ := filepath.Abs(wtPath)
-	fmt.Printf("Worktree created at: %s\n", absPath)
-	fmt.Printf("Branch: %s\n", branchName)
+	absPath, err := filepath.Abs(wtPath)
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(os.Stderr, "Worktree created at: %s\n", absPath)
+	fmt.Fprintf(os.Stderr, "Branch: %s\n", branchName)
+	fmt.Fprintf(os.Stderr, "Or from this shell: cd %q\n", absPath)
+
+	if printPath {
+		fmt.Println(absPath)
+	}
+
+	if shouldOfferEnterShell(noEnter, printPath) {
+		enter, err := prompt.AskConfirm("Open a shell in the new worktree?", true)
+		if err != nil {
+			return err
+		}
+		if enter {
+			return runShellInDir(absPath)
+		}
+	}
 
 	return nil
+}
+
+func shouldOfferEnterShell(noEnter, printPath bool) bool {
+	if noEnter || printPath {
+		return false
+	}
+	return term.IsTerminal(int(os.Stdin.Fd())) && term.IsTerminal(int(os.Stdout.Fd()))
+}
+
+func runShellInDir(dir string) error {
+	shell := os.Getenv("SHELL")
+	if shell == "" {
+		shell = "/bin/sh"
+	}
+	c := exec.Command(shell)
+	c.Dir = dir
+	c.Stdin = os.Stdin
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	c.Env = os.Environ()
+	return c.Run()
 }
