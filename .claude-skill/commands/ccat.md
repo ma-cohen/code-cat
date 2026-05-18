@@ -59,6 +59,20 @@ ccat new-worktree --no-enter                    # skip opening a shell in the ne
 After creation, messages go to stderr. On an interactive TTY, `ccat` can open a subshell in the
 new directory (decline with `--no-enter`). For a `cd` in the **current** shell, use `--print-path`.
 
+### `ccat main-worktree`
+
+Resolve the repository **primary** worktree (Git lists it first) and either print its path or offer
+to open your shell there. Use when you are in a linked worktree and want to jump back to the main
+checkout directory (not the same as `ccat home`, which resets the current checkout’s branch).
+
+```
+ccat main-worktree
+ccat main-worktree --print-path      # stdout: only absolute path (use with cd "$(ccat ...)")
+ccat main-worktree --no-enter
+```
+
+`ccat primary-worktree` is an alias.
+
 ### `ccat remove-worktree`
 
 Remove linked worktrees interactively. Multi-select paths to remove, or choose **All removable
@@ -111,5 +125,6 @@ Config precedence: repo-local `.code-cat.yml` > user-global `~/.config/code-cat/
 - Use `ccat home` when you need to get back to the base branch cleanly.
 - Use `ccat stash` to quickly save named work-in-progress changes, and `ccat stash pop` to restore one interactively.
 - Use `ccat new-worktree` when you want to work on multiple branches simultaneously in separate directories.
+- Use `ccat main-worktree` (or `--print-path` + `cd`) to return to the primary worktree from a linked one.
 - Use `ccat remove-worktree` to clean up extra linked worktrees (with an “all” option).
 - Use `ccat pr` to open the existing PR/MR for the current branch.

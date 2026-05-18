@@ -44,6 +44,19 @@ In a normal interactive terminal, after the worktree is created you can opt in t
 shell (`$SHELL`) with its working directory set to the new path. For a real `cd` in the
 current shell, use `cd "$(ccat new-worktree ... --print-path)"` (or a small shell wrapper).
 
+### `ccat main-worktree`
+
+Print the primary repository worktree path or open a shell there. The primary worktree is always the
+first path Git reports for this repository (usually the original checkout).
+
+```
+ccat main-worktree                 # hints on stderr; on TTY, optional subshell in primary worktree
+ccat main-worktree --print-path   # stdout: only absolute path (use with cd "$(ccat ...)")
+ccat main-worktree --no-enter      # skip “open a shell here?” on interactive terminals
+```
+
+Also available as `ccat primary-worktree` (alias).
+
 ### `ccat remove-worktree`
 
 Interactively remove linked worktrees (not the checkout you are currently in). Choose one or

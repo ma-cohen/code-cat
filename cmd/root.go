@@ -24,6 +24,7 @@ var topLevelCommands = []*cobra.Command{
 	homeCmd,
 	stashCmd,
 	newWorktreeCmd,
+	mainWorktreeCmd,
 	removeWorktreeCmd,
 	prCmd,
 	repoCmd,
