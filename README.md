@@ -28,13 +28,16 @@ ccat home --no-fetch      # skip git fetch
 
 ### `ccat new-worktree [path]`
 
-Create a git worktree in a separate directory on a new branch.
+Create a git worktree in a separate directory on a **new branch from origin’s default branch** (`origin/HEAD`,
+or `main` / `master` after fetch). Your current branch does not affect the starting point; use `--base` to pick a different remote-tracking branch.
+
+Git commands run from the repo root; default suggested paths use `worktree_root` relative to that root (even when your shell cwd is deeper). Repo-root `.code-cat.yml` still applies `worktree_root` and `branch_prefix`; `base_branch` applies to **`new-task` / `home`**, not `new-worktree`.
 
 ```
 ccat new-worktree                              # prompts for path and branch
 ccat new-worktree ../my-hotfix                 # prompts for branch name only
 ccat new-worktree ../scratch --branch wip/exp  # fully specified
-ccat new-worktree --base main                  # override base branch
+ccat new-worktree --base main                  # branch off origin/main instead of remote default
 ccat new-worktree --no-fetch                   # skip git fetch
 ccat new-worktree --print-path                 # stdout: only the new path (for scripting)
 ccat new-worktree --no-enter                   # skip “open a shell here?” on interactive terminals
@@ -121,9 +124,9 @@ Run the same install command again — the script always fetches the latest rele
 Place a `.code-cat.yml` in your repo root to override defaults:
 
 ```yaml
-base_branch: main        # default: master
-branch_prefix: "feat/"   # prepended to branch names in prompts
-worktree_root: "../wt"   # default parent directory for new worktrees
+base_branch: main        # used by new-task and home (remote default if unset); ignored by new-worktree unless --base
+branch_prefix: "feat/"   # prepended to branch names in prompts (also used by new-worktree)
+worktree_root: "../wt"   # default directory segment for new-worktree suggested paths, relative to repo root (default: ..)
 ```
 
 See `.code-cat.yml.example` for all options.

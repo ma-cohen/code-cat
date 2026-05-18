@@ -44,13 +44,15 @@ Stash names are Git stash messages and are not guaranteed to be unique.
 
 ### `ccat new-worktree [path]`
 
-Create a git worktree in a separate directory on a new branch.
+Create a git worktree on a **new branch from origin’s default trunk** (`origin/HEAD`, else `main`/`master` after fetch). Current checkout branch does not matter; `--base <name>` branches off `origin/<name>` instead.
+
+Runs Git from the repo root; suggested default paths combine repo root + `worktree_root` + branch basename (works from any subdirectory). `base_branch` in `.code-cat.yml` does **not** affect `new-worktree` (only `--base` overrides the remote default).
 
 ```
 ccat new-worktree                               # prompts for path and branch
 ccat new-worktree ../my-hotfix                  # prompts for branch name only
 ccat new-worktree ../scratch --branch wip/exp   # fully specified
-ccat new-worktree --base main                   # override base branch
+ccat new-worktree --base main                   # use origin/main instead of remote default
 ccat new-worktree --no-fetch                    # skip git fetch
 ccat new-worktree --print-path                  # stdout: only absolute path (use with cd "$(ccat ...)")
 ccat new-worktree --no-enter                    # skip opening a shell in the new worktree (TTY only)
@@ -112,9 +114,9 @@ ccat repo                   # opens the repo homepage in your browser
 Place a `.code-cat.yml` in the repo root to override defaults:
 
 ```yaml
-base_branch: main        # default: auto-detected from origin/HEAD, then main/master
+base_branch: main        # new-task / home default trunk when unset; ignored by new-worktree (use --base there)
 branch_prefix: "feat/"   # prepended to branch names in interactive prompts
-worktree_root: "../wt"   # default parent directory for new worktrees (default: ..)
+worktree_root: "../wt"   # new-worktree suggested paths: repo root + this + branch basename (default: ..)
 ```
 
 Config precedence: repo-local `.code-cat.yml` > user-global `~/.config/code-cat/config.yml` > built-in defaults.
@@ -124,7 +126,7 @@ Config precedence: repo-local `.code-cat.yml` > user-global `~/.config/code-cat/
 - Use `ccat new-task` to start any new piece of work — it keeps your base branch fresh.
 - Use `ccat home` when you need to get back to the base branch cleanly.
 - Use `ccat stash` to quickly save named work-in-progress changes, and `ccat stash pop` to restore one interactively.
-- Use `ccat new-worktree` when you want to work on multiple branches simultaneously in separate directories.
+- Use `ccat new-worktree` when you want another checkout always based on the remote default trunk (`--base` to override); defaults use repo-root paths even from deep subdirectories.
 - Use `ccat main-worktree` (or `--print-path` + `cd`) to return to the primary worktree from a linked one.
 - Use `ccat remove-worktree` to clean up extra linked worktrees (with an “all” option).
 - Use `ccat pr` to open the existing PR/MR for the current branch.
