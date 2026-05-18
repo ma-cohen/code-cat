@@ -71,6 +71,8 @@ If no PR/MR exists for the current branch, the provider CLI will display an erro
 
 ## Install
 
+Prebuilt binaries: [GitHub Releases](https://github.com/ma-cohen/code-cat/releases).
+
 ### Windows
 
 ```powershell
