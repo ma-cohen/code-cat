@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -10,10 +11,10 @@ import (
 
 func writeYAML(t *testing.T, path, content string) {
 	t.Helper()
-	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -122,5 +123,89 @@ func TestLoad_EmptyConfigFile(t *testing.T) {
 
 	if C.WorktreeRoot != ".." {
 		t.Errorf("WorktreeRoot: got %q, want %q", C.WorktreeRoot, "..")
+	}
+}
+
+func TestMergeDotCodeCatRepo(t *testing.T) {
+	prev := C
+	t.Cleanup(func() { C = prev })
+
+	dir := t.TempDir()
+	path := filepath.Join(dir, ".code-cat.yml")
+	content := "worktree_root: ../wt\nbranch_prefix: \"feat/\"\n"
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	C.WorktreeRoot = ".."
+	C.BranchPrefix = ""
+
+	if err := MergeDotCodeCatRepo(dir); err != nil {
+		t.Fatal(err)
+	}
+	if C.WorktreeRoot != "../wt" {
+		t.Errorf("WorktreeRoot = %q, want ../wt", C.WorktreeRoot)
+	}
+	if C.BranchPrefix != "feat/" {
+		t.Errorf("BranchPrefix = %q, want feat/", C.BranchPrefix)
+	}
+}
+
+func TestMergeDotCodeCatRepoIgnoresBaseBranch(t *testing.T) {
+	prev := C
+	t.Cleanup(func() { C = prev })
+
+	dir := t.TempDir()
+	path := filepath.Join(dir, ".code-cat.yml")
+	content := "base_branch: never-used\nworktree_root: custom-root\n"
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	C.BaseBranch = "keep-me"
+	C.WorktreeRoot = ".."
+
+	if err := MergeDotCodeCatRepo(dir); err != nil {
+		t.Fatal(err)
+	}
+	if C.BaseBranch != "keep-me" {
+		t.Errorf("BaseBranch = %q, should not be overwritten by repo yaml", C.BaseBranch)
+	}
+	if C.WorktreeRoot != "custom-root" {
+		t.Errorf("WorktreeRoot = %q, want custom-root", C.WorktreeRoot)
+	}
+}
+
+func TestMergeDotCodeCatRepoMissingFileNoOp(t *testing.T) {
+	prev := C
+	t.Cleanup(func() { C = prev })
+
+	dir := t.TempDir()
+	C.WorktreeRoot = "stay"
+
+	if err := MergeDotCodeCatRepo(dir); err != nil {
+		t.Fatal(err)
+	}
+	if C.WorktreeRoot != "stay" {
+		t.Errorf("WorktreeRoot = %q, want stay", C.WorktreeRoot)
+	}
+}
+
+func TestMergeDotCodeCatRepoInvalidYAML(t *testing.T) {
+	prev := C
+	t.Cleanup(func() { C = prev })
+
+	dir := t.TempDir()
+	path := filepath.Join(dir, ".code-cat.yml")
+	if err := os.WriteFile(path, []byte(":\nbroken"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	err := MergeDotCodeCatRepo(dir)
+	if err == nil {
+		t.Fatal("expected parse error")
+	}
+	if !strings.Contains(err.Error(), "parse") {
+		t.Errorf("error %q should mention parse", err.Error())
 	}
 }

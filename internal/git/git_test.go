@@ -3,6 +3,7 @@ package git
 import (
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -109,6 +110,45 @@ func TestRun(t *testing.T) {
 			t.Errorf("output %q has leading/trailing whitespace", out)
 		}
 	})
+}
+
+func TestRunIn(t *testing.T) {
+	dir := makeTempRepo(t)
+	sub := filepath.Join(dir, "nested", "deep")
+	if err := os.MkdirAll(sub, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(sub); err != nil {
+		t.Fatal(err)
+	}
+
+	repoRoot, err := WorktreeTopLevel()
+	if err != nil {
+		t.Fatal(err)
+	}
+	want, err := filepath.EvalSymlinks(dir)
+	if err != nil {
+		want = filepath.Clean(dir)
+	} else {
+		want = filepath.Clean(want)
+	}
+	got, err := filepath.EvalSymlinks(repoRoot)
+	if err != nil {
+		got = filepath.Clean(repoRoot)
+	} else {
+		got = filepath.Clean(got)
+	}
+	if got != want {
+		t.Fatalf("WorktreeTopLevel = %q, want %q", repoRoot, dir)
+	}
+
+	out, err := RunIn(repoRoot, "rev-parse", "--abbrev-ref", "HEAD")
+	if err != nil {
+		t.Fatalf("RunIn: %v", err)
+	}
+	if out == "" {
+		t.Fatal("expected non-empty HEAD ref")
+	}
 }
 
 func TestCurrentBranch(t *testing.T) {
@@ -340,6 +380,26 @@ func TestDefaultBranch(t *testing.T) {
 		}
 		if !strings.Contains(err.Error(), "could not determine default branch") {
 			t.Errorf("error %q does not contain expected message", err.Error())
+		}
+		if !strings.Contains(err.Error(), "--base") {
+			t.Errorf("error %q should mention --base", err.Error())
+		}
+	})
+}
+
+func TestDefaultBranchIn(t *testing.T) {
+	t.Run("uses explicit repo dir not cwd", func(t *testing.T) {
+		cloneDir := makeTempRepoWithRemote(t, "main")
+		tmp := t.TempDir()
+		if err := os.Chdir(tmp); err != nil {
+			t.Fatal(err)
+		}
+		branch, err := DefaultBranchIn(cloneDir)
+		if err != nil {
+			t.Fatalf("DefaultBranchIn: %v", err)
+		}
+		if branch != "main" {
+			t.Errorf("got %q, want main", branch)
 		}
 	})
 }

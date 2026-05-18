@@ -15,7 +15,13 @@ type StashEntry struct {
 
 // Run executes a git command in the current working directory and returns trimmed stdout.
 func Run(args ...string) (string, error) {
+	return RunIn("", args...)
+}
+
+// RunIn executes a git command with cmd.Dir set to dir (empty dir means current working directory).
+func RunIn(dir string, args ...string) (string, error) {
 	cmd := exec.Command("git", args...)
+	cmd.Dir = dir
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -94,7 +100,12 @@ func RemoteURL(remote string) (string, error) {
 // DefaultBranch returns the remote's default branch by reading origin/HEAD.
 // Falls back to checking for "main" then "master" if the ref is not set.
 func DefaultBranch() (string, error) {
-	out, err := Run("symbolic-ref", "--short", "refs/remotes/origin/HEAD")
+	return DefaultBranchIn("")
+}
+
+// DefaultBranchIn is like DefaultBranch but runs git commands in dir (see RunIn).
+func DefaultBranchIn(dir string) (string, error) {
+	out, err := RunIn(dir, "symbolic-ref", "--short", "refs/remotes/origin/HEAD")
 	if err == nil {
 		// Returns e.g. "origin/main" — strip the remote prefix.
 		if _, branch, ok := strings.Cut(out, "/"); ok {
@@ -104,9 +115,9 @@ func DefaultBranch() (string, error) {
 	}
 	// Remote HEAD not configured; probe for well-known branch names.
 	for _, candidate := range []string{"main", "master"} {
-		if _, err := Run("show-ref", "--verify", "--quiet", "refs/remotes/origin/"+candidate); err == nil {
+		if _, err := RunIn(dir, "show-ref", "--verify", "--quiet", "refs/remotes/origin/"+candidate); err == nil {
 			return candidate, nil
 		}
 	}
-	return "", fmt.Errorf("could not determine default branch: set base_branch in .code-cat.yml or run: git remote set-head origin --auto")
+	return "", fmt.Errorf("could not determine default branch: pass --base or run: git remote set-head origin --auto")
 }
