@@ -4,6 +4,10 @@ Go CLI tool (`ccat`) that automates Git workflows. Entry point: `cmd/ccat/main.g
 
 All commands must work with both **GitHub** and **GitLab** (including self-hosted GitLab). Provider is auto-detected from the remote URL; no user configuration required.
 
+## Command registration
+
+Top-level subcommands (what appears under `ccat --help`) must be listed in the `topLevelCommands` slice in [`cmd/root.go`](cmd/root.go). Do not call `rootCmd.AddCommand` from individual command files—nested commands (e.g. `stash pop`) still attach via their parent in that command’s `init()`. [`cmd/root_test.go`](cmd/root_test.go) fails if the slice and the root command tree diverge.
+
 ## Testing
 
 **After every bug fix or new feature**, spawn a sub-agent (Task tool) to write tests:
