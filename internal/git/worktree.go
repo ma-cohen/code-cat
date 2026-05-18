@@ -2,6 +2,7 @@ package git
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 )
 
@@ -27,6 +28,23 @@ func ListWorktrees() ([]WorktreeEntry, error) {
 // WorktreeTopLevel returns the absolute path to the top-level of the current worktree.
 func WorktreeTopLevel() (string, error) {
 	return Run("rev-parse", "--show-toplevel")
+}
+
+// PrimaryWorktreePath returns the absolute path to the primary worktree (always the first entry
+// in `git worktree list --porcelain`).
+func PrimaryWorktreePath() (string, error) {
+	entries, err := ListWorktrees()
+	if err != nil {
+		return "", err
+	}
+	if len(entries) == 0 {
+		return "", fmt.Errorf("no worktrees found")
+	}
+	abs, err := filepath.Abs(entries[0].Path)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Clean(abs), nil
 }
 
 // RemoveWorktree runs `git worktree remove` for the given path.

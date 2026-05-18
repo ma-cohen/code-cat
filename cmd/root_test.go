@@ -10,19 +10,20 @@ import (
 
 func TestTopLevelCommandsSyncedWithRoot(t *testing.T) {
 	got := rootCmd.Commands()
-	if len(got) != len(topLevelCommands) {
-		t.Fatalf("rootCmd has %d children, topLevelCommands has %d", len(got), len(topLevelCommands))
-	}
 	want := make(map[*cobra.Command]struct{}, len(topLevelCommands))
 	for _, c := range topLevelCommands {
 		want[c] = struct{}{}
 	}
 	for _, c := range got {
-		if _, ok := want[c]; !ok {
-			t.Errorf("rootCmd has unknown command %q (not in topLevelCommands)", c.Name())
+		if _, ok := want[c]; ok {
+			delete(want, c)
 			continue
 		}
-		delete(want, c)
+		// After rootCmd.Execute(), cobra injects default help and completion commands.
+		if c.Name() == "help" || c.Name() == "completion" {
+			continue
+		}
+		t.Errorf("rootCmd has unknown command %q (not in topLevelCommands)", c.Name())
 	}
 	for c := range want {
 		t.Errorf("topLevelCommands includes %q but it is not on rootCmd", c.Name())

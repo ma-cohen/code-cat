@@ -111,3 +111,25 @@ func TestListWorktrees(t *testing.T) {
 		t.Errorf("expected main and side-branch entries: %#v", list)
 	}
 }
+
+func TestPrimaryWorktreePath(t *testing.T) {
+	makeTempRepo(t)
+
+	mainTop, err := WorktreeTopLevel()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	wtDir := filepath.Join(t.TempDir(), "extra-wt")
+	if _, err := Run("worktree", "add", "-b", "side-branch", wtDir); err != nil {
+		t.Fatalf("worktree add: %v", err)
+	}
+
+	primary, err := PrimaryWorktreePath()
+	if err != nil {
+		t.Fatalf("PrimaryWorktreePath: %v", err)
+	}
+	if filepath.Clean(primary) != filepath.Clean(mainTop) {
+		t.Errorf("PrimaryWorktreePath() = %q, want %q", primary, mainTop)
+	}
+}
